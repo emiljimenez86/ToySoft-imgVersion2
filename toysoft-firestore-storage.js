@@ -54,6 +54,14 @@ export async function installToySoftStorage() {
   db = firebase.firestore(app);
 
   try {
+    if (cfg.measurementId && typeof firebase.analytics === 'function') {
+      firebase.analytics(app);
+    }
+  } catch (e) {
+    /* bloqueadores de anuncios o entorno sin soporte */
+  }
+
+  try {
     await db.enablePersistence({ synchronizeTabs: true });
   } catch (e) {
     /* modo privado, segundo cliente, etc. */

@@ -8,7 +8,8 @@ window.TOYSOFT_FIREBASE_CONFIG = {
   projectId: 'tu-proyecto',
   storageBucket: 'tu-proyecto.appspot.com',
   messagingSenderId: '000000000000',
-  appId: '1:000000000000:web:xxxxxxxx'
+  appId: '1:000000000000:web:xxxxxxxx',
+  measurementId: 'G-XXXXXXXXXX'
 };
 
 /*
