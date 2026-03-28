@@ -113,8 +113,40 @@ export async function installToySoftStorage() {
     }
   }
 
-  await new Promise((resolve, reject) => {
-    db.collection(COLLECTION_NAME).onSnapshot(
+  /** Evita que la app quede colgada si el primer snapshot nunca llega (red lenta, throttling, etc.). */
+  const FIRST_SYNC_TIMEOUT_MS = 20000;
+  let firestoreUnsub = null;
+  let syncTimeoutId = null;
+
+  const syncResult = await new Promise((resolve) => {
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      if (syncTimeoutId !== null) {
+        clearTimeout(syncTimeoutId);
+        syncTimeoutId = null;
+      }
+      resolve(value);
+    };
+
+    syncTimeoutId = setTimeout(() => {
+      syncTimeoutId = null;
+      if (typeof firestoreUnsub === 'function') {
+        try {
+          firestoreUnsub();
+        } catch (e) {
+          /* ignorar */
+        }
+        firestoreUnsub = null;
+      }
+      console.warn(
+        '[ToySoft] Firestore no respondió a tiempo; se usa localStorage del navegador. Revisa red, reglas o vuelve a cargar.'
+      );
+      finish('timeout');
+    }, FIRST_SYNC_TIMEOUT_MS);
+
+    firestoreUnsub = db.collection(COLLECTION_NAME).onSnapshot(
       (snapshot) => {
         if (firstSnapshot) {
           firstSnapshot = false;
@@ -136,13 +168,18 @@ export async function installToySoftStorage() {
               }
             }
             if (n > 0) batches.push(batch.commit());
-            Promise.all(batches).then(() => resolve()).catch(reject);
+            Promise.all(batches)
+              .then(() => finish('ok'))
+              .catch((e) => {
+                console.error('[ToySoft] Error al migrar datos a Firestore:', e);
+                finish('timeout');
+              });
           } else {
             snapshot.docs.forEach((doc) => {
               const d = doc.data();
               if (d && typeof d.v === 'string') memory[docIdToKey(doc.id)] = d.v;
             });
-            resolve();
+            finish('ok');
           }
           return;
         }
@@ -169,11 +206,15 @@ export async function installToySoftStorage() {
             const k = nativeLS.key(i);
             if (k) memory[k] = nativeLS.getItem(k);
           }
-          resolve();
+          finish('ok');
         }
       }
     );
   });
+
+  if (syncResult === 'timeout') {
+    return;
+  }
 
   async function flushDirty() {
     if (!db || dirty.size === 0) return;

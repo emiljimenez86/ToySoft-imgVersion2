@@ -15,6 +15,11 @@ function loadScript(src) {
 
 const el = document.getElementById('toysoft-script-queue');
 const scripts = el ? JSON.parse(el.textContent) : [];
+const bootstrapUrls = scripts.filter((s) => /bootstrap.*\.bundle(\.min)?\.js/i.test(s));
+
+for (const src of bootstrapUrls) {
+  await loadScript(src);
+}
 
 try {
   await installToySoftStorage();
@@ -22,6 +27,8 @@ try {
   console.error('[ToySoft] No se pudo inicializar Firestore/almacenamiento:', e);
 }
 
+const bootstrapSet = new Set(bootstrapUrls);
 for (const src of scripts) {
+  if (bootstrapSet.has(src)) continue;
   await loadScript(src);
 }
