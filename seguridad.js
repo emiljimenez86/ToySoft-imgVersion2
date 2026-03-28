@@ -13,6 +13,23 @@ function usaFirebaseAuth() {
     );
 }
 
+/**
+ * Tras cargar la página, Firebase Auth aún puede estar restaurando la sesión:
+ * currentUser es null unos instantes aunque el usuario ya haya iniciado sesión.
+ * Ejecuta callback después del primer onAuthStateChanged (estado real).
+ */
+function ejecutarCuandoAuthListo(callback) {
+    if (typeof callback !== 'function') return;
+    if (!usaFirebaseAuth()) {
+        callback();
+        return;
+    }
+    const unsub = firebase.auth().onAuthStateChanged(function () {
+        unsub();
+        callback();
+    });
+}
+
 // Verificar si hay una sesión activa
 function verificarSesion() {
     const sesionActiva = localStorage.getItem('sesionActiva') === 'true';

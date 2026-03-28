@@ -1973,23 +1973,30 @@ function imprimirTirillaInventario() {
 
 // Cargar inventario al iniciar (solo si estamos en la página de inventario)
 document.addEventListener('DOMContentLoaded', function() {
-    if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
-        return;
-    }
+    function iniciarInventario() {
+        if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+            return;
+        }
 
-    // Cargar datos en memoria siempre (para que estén disponibles en POS)
-    const inventarioGuardado = localStorage.getItem('inventario');
-    if (inventarioGuardado) {
-        try {
-            inventario = JSON.parse(inventarioGuardado);
-        } catch (error) {
-            console.error('Error al parsear inventario:', error);
+        // Cargar datos en memoria siempre (para que estén disponibles en POS)
+        const inventarioGuardado = localStorage.getItem('inventario');
+        if (inventarioGuardado) {
+            try {
+                inventario = JSON.parse(inventarioGuardado);
+            } catch (error) {
+                console.error('Error al parsear inventario:', error);
+            }
+        }
+
+        // Solo inicializar la UI si estamos en la página de inventario
+        const tablaInventario = document.getElementById('tablaInventario');
+        if (tablaInventario) {
+            cargarInventario();
         }
     }
-    
-    // Solo inicializar la UI si estamos en la página de inventario
-    const tablaInventario = document.getElementById('tablaInventario');
-    if (tablaInventario) {
-        cargarInventario();
+    if (typeof ejecutarCuandoAuthListo === 'function') {
+        ejecutarCuandoAuthListo(iniciarInventario);
+    } else {
+        iniciarInventario();
     }
 }); 

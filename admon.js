@@ -500,15 +500,19 @@ function abrirPantallaCocina() {
 
 // Event listener único para DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Sesión general (Firebase + sesionActiva) antes del PIN: evita que tras un PIN correcto redirija a index sin explicación
-    if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
-        return;
+    function iniciarTrasSesion() {
+        if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+            return;
+        }
+        verificarAccesoAdministracion();
+        cargarConfigHorarioOperacion();
+        cargarConfigPantallaCocina();
     }
-
-    verificarAccesoAdministracion();
-
-    cargarConfigHorarioOperacion();
-    cargarConfigPantallaCocina();
+    if (typeof ejecutarCuandoAuthListo === 'function') {
+        ejecutarCuandoAuthListo(iniciarTrasSesion);
+    } else {
+        iniciarTrasSesion();
+    }
 });
 
 // Funciones para Categorías

@@ -8,32 +8,39 @@ let recordatorioEditando = null;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando sistema de recordatorios...');
 
-    if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
-        return;
-    }
+    function iniciar() {
+        if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+            return;
+        }
 
-    // Cargar recordatorios desde app.js
-    if (typeof cargarRecordatorios === 'function') {
-        cargarRecordatorios();
+        // Cargar recordatorios desde app.js
+        if (typeof cargarRecordatorios === 'function') {
+            cargarRecordatorios();
+        }
+
+        // Configurar fecha mínima para datetime-local
+        const fechaLimiteInput = document.getElementById('fechaLimiteRecordatorio');
+        if (fechaLimiteInput) {
+            const ahora = new Date();
+            const fechaMinima = new Date(ahora.getTime() - (ahora.getTimezoneOffset() * 60000));
+            fechaLimiteInput.min = fechaMinima.toISOString().slice(0, 16);
+        }
+
+        // Cargar interfaz
+        cargarInterfazRecordatorios();
+
+        // Configurar intervalos de actualización
+        setInterval(actualizarEstadisticas, 30000); // Cada 30 segundos
+        setInterval(verificarRecordatoriosVencidos, 60000); // Cada minuto
+
+        // Actualizar estado de notificaciones
+        actualizarEstadoNotificaciones();
     }
-    
-    // Configurar fecha mínima para datetime-local
-    const fechaLimiteInput = document.getElementById('fechaLimiteRecordatorio');
-    if (fechaLimiteInput) {
-        const ahora = new Date();
-        const fechaMinima = new Date(ahora.getTime() - (ahora.getTimezoneOffset() * 60000));
-        fechaLimiteInput.min = fechaMinima.toISOString().slice(0, 16);
+    if (typeof ejecutarCuandoAuthListo === 'function') {
+        ejecutarCuandoAuthListo(iniciar);
+    } else {
+        iniciar();
     }
-    
-    // Cargar interfaz
-    cargarInterfazRecordatorios();
-    
-    // Configurar intervalos de actualización
-    setInterval(actualizarEstadisticas, 30000); // Cada 30 segundos
-    setInterval(verificarRecordatoriosVencidos, 60000); // Cada minuto
-    
-    // Actualizar estado de notificaciones
-    actualizarEstadoNotificaciones();
 });
 
 // Función para crear recordatorio desde el formulario

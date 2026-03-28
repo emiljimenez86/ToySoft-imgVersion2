@@ -212,6 +212,13 @@ function exportarGastos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!verificarAcceso()) return;
-    cargarGastos();
+    function iniciar() {
+        if (!verificarAcceso()) return;
+        cargarGastos();
+    }
+    if (typeof ejecutarCuandoAuthListo === 'function') {
+        ejecutarCuandoAuthListo(iniciar);
+    } else {
+        iniciar();
+    }
 }); 

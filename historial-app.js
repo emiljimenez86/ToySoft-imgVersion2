@@ -904,19 +904,25 @@
     // Cargar datos al iniciar
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 Cargando historial.html...');
-        if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
-            return;
+        function iniciarHistorial() {
+            if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+                return;
+            }
+            mostrarVentas(obtenerVentas());
+            mostrarCocina(obtenerCocina());
+            mostrarCierresAdmin(obtenerCierresAdmin());
+            mostrarCierresOperativo(obtenerCierresOperativo());
+
+            setTimeout(() => {
+                console.log('🔍 Verificando rol después de cargar datos...');
+                verificarRolUsuario();
+            }, 200);
         }
-        mostrarVentas(obtenerVentas());
-        mostrarCocina(obtenerCocina());
-        mostrarCierresAdmin(obtenerCierresAdmin());
-        mostrarCierresOperativo(obtenerCierresOperativo());
-        
-        // Verificar rol después de cargar los datos
-        setTimeout(() => {
-          console.log('🔍 Verificando rol después de cargar datos...');
-          verificarRolUsuario();
-        }, 200);
+        if (typeof ejecutarCuandoAuthListo === 'function') {
+            ejecutarCuandoAuthListo(iniciarHistorial);
+        } else {
+            iniciarHistorial();
+        }
     });
 
 
