@@ -16,7 +16,11 @@ function loadScript(src) {
 const el = document.getElementById('toysoft-script-queue');
 const scripts = el ? JSON.parse(el.textContent) : [];
 
-await installToySoftStorage();
+try {
+  await installToySoftStorage();
+} catch (e) {
+  console.error('[ToySoft] No se pudo inicializar Firestore/almacenamiento:', e);
+}
 
 for (const src of scripts) {
   await loadScript(src);

@@ -270,6 +270,12 @@ function verificarPinAdministracion() {
 
 // Función para verificar acceso - siempre pide PIN
 function verificarAccesoAdministracion() {
+    if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+        console.error('Bootstrap no está cargado. Revisa la consola y la carga de scripts (toysoft-boot / red).');
+        alert('No se pudo cargar la interfaz (Bootstrap). Recarga la página o revisa tu conexión.');
+        return false;
+    }
+
     // Limpiar cualquier acceso previo guardado
     localStorage.removeItem('accesoAdministracion');
     localStorage.removeItem('accesoAdministracionTimestamp');
@@ -494,10 +500,13 @@ function abrirPantallaCocina() {
 
 // Event listener único para DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar acceso de administración primero
+    // Sesión general (Firebase + sesionActiva) antes del PIN: evita que tras un PIN correcto redirija a index sin explicación
+    if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+        return;
+    }
+
     verificarAccesoAdministracion();
-    
-    // Cargar configuraciones
+
     cargarConfigHorarioOperacion();
     cargarConfigPantallaCocina();
 });
@@ -1791,26 +1800,7 @@ function cargarDatosNegocio() {
     }
 }
 
-// Función para verificar acceso básico (sesión general)
-function verificarAcceso() {
-    const cfg = window.TOYSOFT_FIREBASE_CONFIG;
-    if (cfg && cfg.apiKey && typeof firebase !== 'undefined' && typeof firebase.auth === 'function') {
-        if (!firebase.auth().currentUser) {
-            localStorage.removeItem('sesionActiva');
-            console.log('No hay sesión Firebase, redirigiendo al login...');
-            window.location.href = 'index.html';
-            return false;
-        }
-    }
-    const sesionActiva = localStorage.getItem('sesionActiva') === 'true';
-    if (!sesionActiva) {
-        console.log('No hay sesión activa, redirigiendo al login...');
-        window.location.href = 'index.html';
-        return false;
-    }
-    console.log('Sesión activa verificada');
-    return true;
-}
+// verificarAcceso() viene de seguridad.js (Firebase + sesionActiva)
 
 // ===== FUNCIONES DE EMAILJS =====
 

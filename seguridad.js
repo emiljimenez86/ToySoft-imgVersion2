@@ -39,11 +39,13 @@ function verificarAcceso() {
     if (usaFirebaseAuth() && !firebase.auth().currentUser) {
         localStorage.removeItem('sesionActiva');
         console.log('Redirigiendo al login (sin sesión Firebase)...');
+        alert('Debes iniciar sesión en el inicio antes de abrir esta página.');
         window.location.href = 'index.html';
         return false;
     }
     if (!verificarSesion()) {
         console.log('Redirigiendo al login...');
+        alert('Debes iniciar sesión en el inicio antes de abrir esta página.');
         window.location.href = 'index.html';
         return false;
     }
