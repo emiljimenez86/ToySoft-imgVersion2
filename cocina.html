@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla de Cocina - ToySoft</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .header-cocina {
+      background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+      padding: 6px 16px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-cocina h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-cocina .subtitle {
+      font-size: 0.85rem;
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    .container-cocina {
+      padding: 12px;
+      max-width: 100%;
+      margin: 0 auto;
+      width: 100%;
+      height: calc(100vh - 70px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pedidos-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 8px;
+      width: 100%;
+      height: calc(100vh - 120px);
+      overflow: hidden;
+      padding: 0;
+      align-content: center;
+      justify-content: center;
+    }
+
+    .pedidos-grid.ajuste-dinamico {
+      transition: all 0.3s ease;
+    }
+
+    .pedidos-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .pedidos-grid::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .pedidos-grid::-webkit-scrollbar-thumb {
+      background: #ff6b35;
+      border-radius: 4px;
+    }
+
+    .pedidos-grid::-webkit-scrollbar-thumb:hover {
+      background: #f7931e;
+    }
+
+    .pedido-card {
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      border: 3px solid #ff6b35;
+      transition: all 0.3s ease;
+      position: relative;
+      animation: slideIn 0.5s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .pedido-card.tamano-pequeno {
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      border: 2px solid #ff6b35;
+      font-size: 0.75em;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-header {
+      padding: 5px;
+      margin-bottom: 5px;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-header h3 {
+      font-size: 0.9em;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-items {
+      font-size: 0.85em;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-footer {
+      padding: 5px;
+      font-size: 0.8em;
+    }
+
+    .pedido-card.tamano-mediano {
+      border-radius: 11px;
+      padding: 15px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      border: 2px solid #ff6b35;
+      font-size: 0.9em;
+    }
+
+    .pedido-card.tamano-mediano .pedido-header {
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+
+    .pedido-card.tamano-mediano .pedido-items {
+      font-size: 0.9em;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .pedido-card.nuevo {
+      animation: highlightNew 1s ease;
+      border-color: #ffd700;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+
+    @keyframes highlightNew {
+      0%, 100% {
+        border-color: #ffd700;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+      }
+      50% {
+        border-color: #ff6b35;
+        box-shadow: 0 0 50px rgba(255, 107, 53, 0.8);
+      }
+    }
+
+    .pedido-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ff6b35;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-header {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+    }
+
+    .pedido-card.tamano-mediano .pedido-header {
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+    }
+
+    .pedido-codigo {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #ff6b35;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-codigo {
+      font-size: 1.1rem;
+    }
+
+    .pedido-card.tamano-mediano .pedido-codigo {
+      font-size: 1.5rem;
+    }
+
+    .pedido-ronda {
+      background: #ff6b35;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-ronda {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+    }
+
+    .pedido-card.tamano-mediano .pedido-ronda {
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+    }
+
+    .pedido-info {
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+      flex-shrink: 1;
+      min-height: 0;
+      max-height: 42%;
+      overflow: hidden;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-info {
+      margin-bottom: 4px;
+      max-height: 38%;
+    }
+
+    .pedido-card.tamano-mediano .pedido-info {
+      margin-bottom: 6px;
+      max-height: 40%;
+    }
+
+    .pedido-info-item {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-info-item {
+      font-size: 0.7rem;
+      margin-bottom: 5px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .pedido-card.tamano-mediano .pedido-info-item {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      padding: 6px;
+      border-radius: 6px;
+    }
+
+    .pedido-info-item strong {
+      color: #ffd700;
+    }
+
+    /* Domicilio/Recoger: compactar datos de cliente para dejar más espacio a los platos */
+    .pedido-card.es-domicilio .pedido-info,
+    .pedido-card.es-recoger .pedido-info {
+      max-height: 36%;
+    }
+
+    .pedido-card.es-domicilio .pedido-info-item,
+    .pedido-card.es-recoger .pedido-info-item {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      padding: 4px 6px;
+    }
+
+    .pedido-card.tamano-pequeno.es-domicilio .pedido-info-item,
+    .pedido-card.tamano-pequeno.es-recoger .pedido-info-item {
+      font-size: 0.6rem;
+      margin-bottom: 2px;
+      padding: 3px 4px;
+    }
+
+    .pedido-card.tamano-mediano.es-domicilio .pedido-info-item,
+    .pedido-card.tamano-mediano.es-recoger .pedido-info-item {
+      font-size: 0.75rem;
+      margin-bottom: 3px;
+      padding: 4px 5px;
+    }
+
+    .productos-lista {
+      margin-top: 6px;
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .pedido-card.tamano-pequeno .productos-lista {
+      min-height: 0;
+    }
+
+    .pedido-card.tamano-mediano .productos-lista {
+      min-height: 0;
+    }
+
+    /* Tabla tipo recibo imprimible: Cant | Producto (igual que el ticket) */
+    .tabla-recibo-cocina {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: inherit;
+      table-layout: fixed;
+    }
+
+    .tabla-recibo-cocina thead {
+      border-bottom: 1px dashed rgba(255, 107, 53, 0.7);
+    }
+
+    .tabla-recibo-cocina th {
+      padding: 4px 6px;
+      text-align: left;
+      font-weight: bold;
+      color: #ff6b35;
+      font-size: 0.95em;
+    }
+
+    .tabla-recibo-cocina .th-cant {
+      width: 18%;
+    }
+
+    .tabla-recibo-cocina .th-producto {
+      width: 82%;
+    }
+
+    .tabla-recibo-cocina .producto-fila td {
+      padding: 3px 6px;
+      vertical-align: top;
+      line-height: 1.2;
+      border-bottom: 1px solid rgba(255, 107, 53, 0.15);
+    }
+
+    .tabla-recibo-cocina .td-cant {
+      font-weight: bold;
+      color: #ff6b35;
+      font-size: 1.05em;
+    }
+
+    .tabla-recibo-cocina .td-producto {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    .tabla-recibo-cocina .td-producto .producto-nombre {
+      font-weight: bold;
+      word-wrap: break-word;
+    }
+
+    .tabla-recibo-cocina .producto-detalle {
+      margin-top: 2px;
+      margin-left: 0;
+      color: #b0b0b0;
+      font-size: 0.9em;
+      font-style: italic;
+      word-wrap: break-word;
+    }
+
+    .pedido-card.tamano-pequeno .tabla-recibo-cocina th,
+    .pedido-card.tamano-pequeno .tabla-recibo-cocina .producto-fila td {
+      padding: 2px 4px;
+      font-size: 0.85em;
+    }
+
+    /* Escalado por cantidad de ítems: todo el pedido visible sin scroll (TV sin mouse) */
+    .pedido-card.items-4 .tabla-recibo-cocina { font-size: 0.9em; }
+    .pedido-card.items-4 .tabla-recibo-cocina .producto-fila td { padding: 2px 5px; line-height: 1.15; }
+    .pedido-card.items-5 .tabla-recibo-cocina { font-size: 0.85em; }
+    .pedido-card.items-5 .tabla-recibo-cocina .producto-fila td { padding: 2px 4px; line-height: 1.1; }
+    .pedido-card.items-6 .tabla-recibo-cocina { font-size: 0.72em; }
+    .pedido-card.items-6 .tabla-recibo-cocina .producto-fila td { padding: 0 4px; line-height: 1.06; }
+    .pedido-card.items-7 .tabla-recibo-cocina { font-size: 0.62em; }
+    .pedido-card.items-7 .tabla-recibo-cocina .producto-fila td { padding: 0 3px; line-height: 1.04; }
+    .pedido-card.items-8 .tabla-recibo-cocina { font-size: 0.56em; }
+    .pedido-card.items-8 .tabla-recibo-cocina .producto-fila td { padding: 0 3px; line-height: 1.03; }
+    .pedido-card.items-9 .tabla-recibo-cocina { font-size: 0.52em; }
+    .pedido-card.items-9 .tabla-recibo-cocina .producto-fila td { padding: 0 2px; line-height: 1.02; }
+    .pedido-card.items-10 .tabla-recibo-cocina,
+    .pedido-card.items-11 .tabla-recibo-cocina,
+    .pedido-card.items-12 .tabla-recibo-cocina { font-size: 0.48em; }
+    .pedido-card.items-10 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.items-11 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.items-12 .tabla-recibo-cocina .producto-fila td { padding: 0 2px; line-height: 1.02; }
+    /* Con 6+ ítems: reducir cabecera y fecha para dar más espacio a la tabla */
+    .pedido-card.items-6 .pedido-header,
+    .pedido-card.items-7 .pedido-header,
+    .pedido-card.items-8 .pedido-header,
+    .pedido-card.items-9 .pedido-header,
+    .pedido-card.items-10 .pedido-header,
+    .pedido-card.items-11 .pedido-header,
+    .pedido-card.items-12 .pedido-header { padding-bottom: 4px; margin-bottom: 4px; }
+    .pedido-card.items-6 .pedido-codigo,
+    .pedido-card.items-7 .pedido-codigo { font-size: 1rem; }
+    .pedido-card.items-8 .pedido-codigo,
+    .pedido-card.items-9 .pedido-codigo,
+    .pedido-card.items-10 .pedido-codigo,
+    .pedido-card.items-11 .pedido-codigo,
+    .pedido-card.items-12 .pedido-codigo { font-size: 0.9rem; }
+    .pedido-card.items-6 .pedido-info,
+    .pedido-card.items-7 .pedido-info,
+    .pedido-card.items-8 .pedido-info { max-height: 24%; }
+    .pedido-card.items-9 .pedido-info,
+    .pedido-card.items-10 .pedido-info,
+    .pedido-card.items-11 .pedido-info,
+    .pedido-card.items-12 .pedido-info { max-height: 20%; }
+    .pedido-card.items-6 .pedido-info-item,
+    .pedido-card.items-7 .pedido-info-item,
+    .pedido-card.items-8 .pedido-info-item { font-size: 0.75rem; padding: 2px 4px; }
+    .pedido-card.items-9 .pedido-info-item,
+    .pedido-card.items-10 .pedido-info-item,
+    .pedido-card.items-11 .pedido-info-item,
+    .pedido-card.items-12 .pedido-info-item { font-size: 0.7rem; padding: 1px 3px; }
+    .pedido-card.items-6 .pedido-ronda,
+    .pedido-card.items-7 .pedido-ronda { padding: 3px 8px; font-size: 0.8rem; }
+    .pedido-card.items-8 .pedido-ronda,
+    .pedido-card.items-9 .pedido-ronda,
+    .pedido-card.items-10 .pedido-ronda,
+    .pedido-card.items-11 .pedido-ronda,
+    .pedido-card.items-12 .pedido-ronda { padding: 2px 6px; font-size: 0.7rem; }
+    .pedido-card.items-6 .btn-listo,
+    .pedido-card.items-7 .btn-listo { padding: 3px 8px; font-size: 0.65rem; }
+    .pedido-card.items-8 .btn-listo,
+    .pedido-card.items-9 .btn-listo,
+    .pedido-card.items-10 .btn-listo,
+    .pedido-card.items-11 .btn-listo,
+    .pedido-card.items-12 .btn-listo { padding: 2px 6px; font-size: 0.6rem; }
+    /* Detalle de producto más compacto con muchos ítems para que quepan todos */
+    .pedido-card.items-6 .tabla-recibo-cocina .producto-detalle,
+    .pedido-card.items-7 .tabla-recibo-cocina .producto-detalle,
+    .pedido-card.items-8 .tabla-recibo-cocina .producto-detalle { font-size: 0.95em; margin-top: 0; line-height: 1.04; }
+    .pedido-card.items-9 .tabla-recibo-cocina .producto-detalle,
+    .pedido-card.items-10 .tabla-recibo-cocina .producto-detalle,
+    .pedido-card.items-11 .tabla-recibo-cocina .producto-detalle,
+    .pedido-card.items-12 .tabla-recibo-cocina .producto-detalle { font-size: 0.9em; margin-top: 0; line-height: 1.02; }
+
+    /* Con cambio de mesa hay menos espacio: tabla más pequeña para que quepan todos sin scroll (TV sin mouse) */
+    .pedido-card.tiene-cambio-mesa .tabla-recibo-cocina {
+      font-size: 0.82em;
+    }
+    .pedido-card.tiene-cambio-mesa .tabla-recibo-cocina th,
+    .pedido-card.tiene-cambio-mesa .tabla-recibo-cocina .producto-fila td {
+      padding: 1px 4px;
+      line-height: 1.08;
+    }
+    .pedido-card.tiene-cambio-mesa .tabla-recibo-cocina .producto-detalle {
+      font-size: 0.88em;
+      margin-top: 1px;
+      line-height: 1.08;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+    /* Con cambio de mesa + 4 ítems: más pequeño para que quepan los 4 + detalle largo (ej. Picadas con salsas) */
+    .pedido-card.tiene-cambio-mesa.items-4 .tabla-recibo-cocina { font-size: 0.7em; }
+    .pedido-card.tiene-cambio-mesa.items-4 .tabla-recibo-cocina th,
+    .pedido-card.tiene-cambio-mesa.items-4 .tabla-recibo-cocina .producto-fila td { padding: 1px 3px; line-height: 1.05; }
+    .pedido-card.tiene-cambio-mesa.items-4 .tabla-recibo-cocina .producto-detalle { font-size: 0.92em; margin-top: 0; }
+    .pedido-card.tiene-cambio-mesa.items-5 .tabla-recibo-cocina { font-size: 0.72em; }
+    .pedido-card.tiene-cambio-mesa.items-5 .tabla-recibo-cocina .producto-fila td { padding: 1px 3px; }
+    .pedido-card.tiene-cambio-mesa.items-6 .tabla-recibo-cocina { font-size: 0.68em; }
+    .pedido-card.tiene-cambio-mesa.items-6 .tabla-recibo-cocina .producto-fila td { padding: 0 3px; }
+    .pedido-card.tiene-cambio-mesa.items-7 .tabla-recibo-cocina { font-size: 0.64em; }
+    .pedido-card.tiene-cambio-mesa.items-8 .tabla-recibo-cocina { font-size: 0.6em; }
+    .pedido-card.tiene-cambio-mesa.items-9 .tabla-recibo-cocina,
+    .pedido-card.tiene-cambio-mesa.items-10 .tabla-recibo-cocina,
+    .pedido-card.tiene-cambio-mesa.items-11 .tabla-recibo-cocina,
+    .pedido-card.tiene-cambio-mesa.items-12 .tabla-recibo-cocina { font-size: 0.55em; }
+    .pedido-card.tiene-cambio-mesa.items-7 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.tiene-cambio-mesa.items-8 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.tiene-cambio-mesa.items-9 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.tiene-cambio-mesa.items-10 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.tiene-cambio-mesa.items-11 .tabla-recibo-cocina .producto-fila td,
+    .pedido-card.tiene-cambio-mesa.items-12 .tabla-recibo-cocina .producto-fila td { padding: 0 2px; }
+
+    /* Cuando hay muchos pedidos en pantalla, reducir header e info para dejar más espacio a la lista */
+    .pedido-card.total-7 .pedido-header,
+    .pedido-card.total-8 .pedido-header,
+    .pedido-card.total-9 .pedido-header,
+    .pedido-card.total-10 .pedido-header,
+    .pedido-card.total-11 .pedido-header,
+    .pedido-card.total-12 .pedido-header,
+    .pedido-card.total-13 .pedido-header,
+    .pedido-card.total-14 .pedido-header,
+    .pedido-card.total-15 .pedido-header,
+    .pedido-card.total-16 .pedido-header { padding-bottom: 6px; margin-bottom: 6px; }
+    .pedido-card.total-7 .pedido-codigo,
+    .pedido-card.total-8 .pedido-codigo,
+    .pedido-card.total-9 .pedido-codigo { font-size: 1.2rem; }
+    .pedido-card.total-10 .pedido-codigo,
+    .pedido-card.total-11 .pedido-codigo,
+    .pedido-card.total-12 .pedido-codigo { font-size: 1rem; }
+    .pedido-card.total-13 .pedido-codigo,
+    .pedido-card.total-14 .pedido-codigo,
+    .pedido-card.total-15 .pedido-codigo,
+    .pedido-card.total-16 .pedido-codigo { font-size: 0.95rem; }
+    .pedido-card.total-7 .pedido-info,
+    .pedido-card.total-8 .pedido-info,
+    .pedido-card.total-9 .pedido-info { max-height: 38%; }
+    .pedido-card.total-10 .pedido-info,
+    .pedido-card.total-11 .pedido-info,
+    .pedido-card.total-12 .pedido-info { max-height: 32%; }
+    .pedido-card.total-13 .pedido-info,
+    .pedido-card.total-14 .pedido-info,
+    .pedido-card.total-15 .pedido-info,
+    .pedido-card.total-16 .pedido-info { max-height: 28%; }
+    .pedido-card.total-9 .pedido-info-item,
+    .pedido-card.total-10 .pedido-info-item,
+    .pedido-card.total-11 .pedido-info-item,
+    .pedido-card.total-12 .pedido-info-item { font-size: 0.75rem; padding: 3px 5px; }
+    .pedido-card.total-13 .pedido-info-item,
+    .pedido-card.total-14 .pedido-info-item,
+    .pedido-card.total-15 .pedido-info-item,
+    .pedido-card.total-16 .pedido-info-item { font-size: 0.7rem; padding: 2px 4px; }
+    .pedido-card.total-9 .btn-listo,
+    .pedido-card.total-10 .btn-listo,
+    .pedido-card.total-11 .btn-listo,
+    .pedido-card.total-12 .btn-listo { padding: 4px 10px; font-size: 0.7rem; }
+    .pedido-card.total-13 .btn-listo,
+    .pedido-card.total-14 .btn-listo,
+    .pedido-card.total-15 .btn-listo,
+    .pedido-card.total-16 .btn-listo { padding: 3px 8px; font-size: 0.6rem; }
+
+    /* Si la tarjeta tiene muchos ítems (6+), priorizar espacio para la tabla sobre total-* */
+    .pedido-card.items-6 .pedido-info,
+    .pedido-card.items-7 .pedido-info,
+    .pedido-card.items-8 .pedido-info { max-height: 24%; }
+    .pedido-card.items-9 .pedido-info,
+    .pedido-card.items-10 .pedido-info,
+    .pedido-card.items-11 .pedido-info,
+    .pedido-card.items-12 .pedido-info { max-height: 20%; }
+
+    .producto-nombre {
+      font-weight: bold;
+      font-size: 1.3rem;
+      transition: all 0.3s ease;
+    }
+
+    .pedido-card.tamano-pequeno .producto-nombre {
+      font-size: 0.8rem;
+    }
+
+    .pedido-card.tamano-mediano .producto-nombre {
+      font-size: 1rem;
+    }
+
+    .producto-detalle {
+      font-size: 1rem;
+      color: #ccc;
+      margin-top: 5px;
+      margin-left: 52px;
+      font-style: italic;
+      transition: all 0.3s ease;
+    }
+
+    .pedido-card.tamano-pequeno .producto-detalle {
+      font-size: 0.65rem;
+      margin-top: 3px;
+      margin-left: 31px;
+    }
+
+    .pedido-card.tamano-mediano .producto-detalle {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      margin-left: 41px;
+    }
+
+    .pedido-acciones {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      transition: all 0.3s ease;
+      justify-content: center;
+    }
+
+    .pedido-card.tamano-pequeno .pedido-acciones {
+      margin-top: 6px;
+      gap: 6px;
+    }
+
+    .pedido-card.tamano-mediano .pedido-acciones {
+      margin-top: 8px;
+      gap: 8px;
+    }
+
+    .btn-listo {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      white-space: nowrap;
+    }
+
+    .pedido-card.tamano-pequeno .btn-listo {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      box-shadow: 0 1px 4px rgba(40, 167, 69, 0.3);
+    }
+
+    .pedido-card.tamano-mediano .btn-listo {
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-listo:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+    }
+
+    .btn-listo:active {
+      transform: translateY(0);
+    }
+
+
+    .pedido-card.listo {
+      border-color: #28a745;
+      opacity: 0.7;
+      background: linear-gradient(135deg, #1e3a2e 0%, #0f2419 100%);
+    }
+
+    .sin-pedidos {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+
+    .sin-pedidos i {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .sin-pedidos h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .contador-pedidos {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff6b35;
+      color: #fff;
+      padding: 15px 25px;
+      border-radius: 50px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 200;
+    }
+
+    .cambio-mesa-alert {
+      background: #fff3e0;
+      color: #000;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-weight: bold;
+      text-align: center;
+      font-size: 0.75rem;
+      border: 2px solid #ff6b00;
+      flex-shrink: 1;
+      min-height: 0;
+      max-height: 22%;
+      overflow: hidden;
+      line-height: 1.2;
+      word-wrap: break-word;
+    }
+
+    /* Con cambio de mesa: dejar más espacio a la tabla de productos (todo visible como en el recibo) */
+    .pedido-card.tiene-cambio-mesa .cambio-mesa-alert {
+      padding: 2px 5px;
+      margin-bottom: 3px;
+      max-height: 14%;
+      font-size: 0.6rem;
+      line-height: 1.1;
+    }
+
+    .pedido-card.tiene-cambio-mesa .cambio-mesa-alert .cambio-mesa-linea {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .pedido-card.tiene-cambio-mesa .pedido-info {
+      max-height: 22%;
+    }
+
+    .pedido-card.tiene-cambio-mesa .pedido-info-item {
+      padding: 2px 5px;
+      margin-bottom: 2px;
+      font-size: 0.75rem;
+    }
+
+    .pedido-card.tamano-pequeno.tiene-cambio-mesa .cambio-mesa-alert {
+      padding: 1px 4px;
+      max-height: 12%;
+      font-size: 0.5rem;
+    }
+
+    .pedido-card.tamano-pequeno.tiene-cambio-mesa .pedido-info {
+      max-height: 20%;
+    }
+
+    @media (max-width: 768px) {
+      .pedidos-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-cocina h1 {
+        font-size: 2rem;
+      }
+
+      .pedido-codigo {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Estilos para modo pantalla completa */
+    @media (display-mode: fullscreen) {
+      .header-cocina {
+        padding: 10px 20px;
+      }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="header-cocina">
+    <h1><i class="fas fa-utensils"></i> COCINA</h1>
+    <div class="subtitle">Sistema de Pedidos - ToySoft</div>
+  </div>
+
+  <div class="contador-pedidos" id="contadorPedidos">
+    <i class="fas fa-bell"></i> <span id="contadorNumero">0</span> Pedidos
+  </div>
+
+  <div class="container-cocina">
+    <div id="pedidosPendientes" class="pedidos-grid">
+      <!-- Los pedidos se cargarán aquí dinámicamente -->
+    </div>
+
+
+    <div id="sinPedidos" class="sin-pedidos" style="display: none;">
+      <i class="fas fa-utensils"></i>
+      <h2>No hay pedidos pendientes</h2>
+      <p>Los nuevos pedidos aparecerán aquí automáticamente</p>
+    </div>
+  </div>
+
+  <!-- Audio para notificación -->
+  <audio id="audioNotificacion" preload="auto">
+    <!-- El sonido se generará con JavaScript -->
+  </audio>
+
+  <script type="application/json" id="toysoft-script-queue">["cocina-app.js"]</script>
+  <script type="module" src="toysoft-boot.js"></script>
+</body>
+</html>
+
