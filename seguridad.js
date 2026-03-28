@@ -156,19 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    const btnToggleClave = document.getElementById('toggleClaveLogin');
-    const inputClave = document.getElementById('clave');
-    const iconoToggleClave = document.getElementById('iconoToggleClave');
-    if (btnToggleClave && inputClave && iconoToggleClave) {
-        btnToggleClave.addEventListener('click', function () {
-            const mostrar = inputClave.type === 'password';
-            inputClave.type = mostrar ? 'text' : 'password';
-            iconoToggleClave.className = mostrar ? 'fas fa-eye-slash' : 'fas fa-eye';
-            btnToggleClave.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
-            btnToggleClave.setAttribute('title', mostrar ? 'Ocultar' : 'Mostrar');
-        });
-    }
 });
 
 // ===== SISTEMA DE RECORDATORIOS - INTEGRACIÓN =====
