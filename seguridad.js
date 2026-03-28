@@ -66,7 +66,18 @@ async function iniciarSesion() {
             mostrarApp();
         } catch (err) {
             console.error(err);
-            alert('No se pudo iniciar sesión. Revisa correo, contraseña y que el usuario exista en Firebase.');
+            var msg = 'No se pudo iniciar sesión.';
+            var c = err && err.code;
+            if (c === 'auth/invalid-email') msg = 'El correo no tiene un formato válido.';
+            else if (c === 'auth/user-disabled') msg = 'Esta cuenta está deshabilitada.';
+            else if (c === 'auth/user-not-found' || c === 'auth/wrong-password' || c === 'auth/invalid-credential') {
+                msg = 'Correo o contraseña incorrectos.';
+            } else if (c === 'auth/unauthorized-domain') {
+                msg = 'Este sitio no está en dominios autorizados de Firebase (Consola → Autenticación → Configuración).';
+            } else if (c === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera unos minutos.';
+            else if (c === 'auth/network-request-failed') msg = 'Sin conexión o Firebase no responde. Revisa la red.';
+            else if (err && err.message) msg = msg + ' ' + err.message;
+            alert(msg);
         }
         return;
     }

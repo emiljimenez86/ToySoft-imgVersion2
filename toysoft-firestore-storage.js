@@ -57,6 +57,17 @@ export async function installToySoftStorage() {
     return;
   }
 
+  /* Sin esto, en la pantalla de login nunca se crea la app y signInWithEmailAndPassword falla. */
+  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
+
+  try {
+    if (cfg.measurementId && typeof firebase.analytics === 'function') {
+      firebase.analytics(app);
+    }
+  } catch (e) {
+    /* bloqueadores de anuncios o entorno sin soporte */
+  }
+
   const auth = firebase.auth();
   await new Promise((resolve) => {
     const unsub = auth.onAuthStateChanged(() => {
@@ -77,16 +88,7 @@ export async function installToySoftStorage() {
   const dirty = new Map();
   let firstSnapshot = true;
 
-  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
   db = firebase.firestore(app);
-
-  try {
-    if (cfg.measurementId && typeof firebase.analytics === 'function') {
-      firebase.analytics(app);
-    }
-  } catch (e) {
-    /* bloqueadores de anuncios o entorno sin soporte */
-  }
 
   try {
     await db.enablePersistence({ synchronizeTabs: true });
