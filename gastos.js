@@ -212,6 +212,6 @@ function exportarGastos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    verificarAcceso();
+    if (!verificarAcceso()) return;
     cargarGastos();
 }); 

@@ -2672,13 +2672,6 @@ function reiniciarSistema() {
   }, 1000);
 }
 
-// Función para verificar acceso (requerida por POS.html)
-function verificarAcceso() {
-  console.log('Verificando acceso...');
-  // Por ahora, permitir acceso directo
-  return true;
-}
-
 // Función para mostrar todos los productos
 function mostrarTodosLosProductos() {
   const inputBusqueda = document.getElementById('buscarProductoPOS');

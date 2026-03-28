@@ -904,6 +904,9 @@
     // Cargar datos al iniciar
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 Cargando historial.html...');
+        if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+            return;
+        }
         mostrarVentas(obtenerVentas());
         mostrarCocina(obtenerCocina());
         mostrarCierresAdmin(obtenerCierresAdmin());

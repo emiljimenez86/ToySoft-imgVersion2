@@ -1,9 +1,17 @@
-// Configuración de credenciales
+// Configuración de credenciales (solo si no usas Firebase Auth)
 const credenciales = {
     usuario: 'admin',
     clave: '1234'
 };
 
+function usaFirebaseAuth() {
+    return !!(
+        window.TOYSOFT_FIREBASE_CONFIG &&
+        window.TOYSOFT_FIREBASE_CONFIG.apiKey &&
+        typeof firebase !== 'undefined' &&
+        typeof firebase.auth === 'function'
+    );
+}
 
 // Verificar si hay una sesión activa
 function verificarSesion() {
@@ -26,21 +34,44 @@ function verificarCierreDiario() {
 
 
 
-// Verificar sesión y cierre diario
+// Verificar sesión y cierre diario (devuelve false si redirige al login)
 function verificarAcceso() {
+    if (usaFirebaseAuth() && !firebase.auth().currentUser) {
+        localStorage.removeItem('sesionActiva');
+        console.log('Redirigiendo al login (sin sesión Firebase)...');
+        window.location.href = 'index.html';
+        return false;
+    }
     if (!verificarSesion()) {
         console.log('Redirigiendo al login...');
         window.location.href = 'index.html';
-        return;
+        return false;
     }
+    return true;
 }
 
 // Iniciar sesión
-function iniciarSesion() {
-    const usuario = document.getElementById('usuario').value;
+async function iniciarSesion() {
+    const usuario = document.getElementById('usuario').value.trim();
     const clave = document.getElementById('clave').value;
 
-    console.log('Intento de login:', usuario, clave);
+    if (usaFirebaseAuth()) {
+        try {
+            await firebase.auth().signInWithEmailAndPassword(usuario, clave);
+            localStorage.setItem('sesionActiva', 'true');
+            if (typeof window.installToySoftStorage === 'function') {
+                await window.installToySoftStorage();
+            }
+            console.log('Login Firebase exitoso');
+            mostrarApp();
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo iniciar sesión. Revisa correo, contraseña y que el usuario exista en Firebase.');
+        }
+        return;
+    }
+
+    console.log('Intento de login (local):', usuario);
 
     if (usuario === credenciales.usuario && clave === credenciales.clave) {
         console.log('Login exitoso');
@@ -81,7 +112,14 @@ function mostrarApp() {
 }
 
 // Cerrar sesión
-function cerrarSesion() {
+async function cerrarSesion() {
+    if (usaFirebaseAuth()) {
+        try {
+            await firebase.auth().signOut();
+        } catch (e) {
+            console.warn('Error al cerrar sesión Firebase:', e);
+        }
+    }
     localStorage.removeItem('sesionActiva');
     window.location.href = 'index.html';
 }
@@ -90,19 +128,33 @@ function cerrarSesion() {
 document.addEventListener('DOMContentLoaded', function() {
     const loginSection = document.getElementById('loginSection');
     const appSection = document.getElementById('appSection');
-    
-    if (localStorage.getItem('sesionActiva') === 'true') {
-        loginSection.style.display = 'none';
-        appSection.style.display = 'block';
-        appSection.style.opacity = '1';
-    } else {
-        loginSection.style.opacity = '1';
+
+    let sesionOk = localStorage.getItem('sesionActiva') === 'true';
+    if (usaFirebaseAuth() && !firebase.auth().currentUser) {
+        sesionOk = false;
+        localStorage.removeItem('sesionActiva');
     }
 
-    
-    // Inicializar sistema de recordatorios si ya hay sesión activa
-    if (localStorage.getItem('sesionActiva') === 'true') {
+    if (loginSection && appSection) {
+        if (sesionOk) {
+            loginSection.style.display = 'none';
+            appSection.style.display = 'block';
+            appSection.style.opacity = '1';
+        } else {
+            loginSection.style.opacity = '1';
+        }
+    }
+
+    if (sesionOk) {
         setTimeout(inicializarSistemaRecordatorios, 1000);
+    }
+
+    if (usaFirebaseAuth()) {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (!user) {
+                localStorage.removeItem('sesionActiva');
+            }
+        });
     }
 });
 

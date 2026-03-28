@@ -5,6 +5,11 @@
 
 const COLLECTION_NAME = 'toysoft_kv';
 
+/** Referencia al localStorage real del navegador (antes de sustituirlo por el shim). */
+const NATIVE_LOCAL_STORAGE = window.localStorage;
+
+let firestoreShimInstalled = false;
+
 function keyToDocId(key) {
   try {
     return btoa(unescape(encodeURIComponent(key)))
@@ -30,6 +35,10 @@ function docIdToKey(id) {
 }
 
 export async function installToySoftStorage() {
+  if (firestoreShimInstalled) {
+    return;
+  }
+
   const cfg = window.TOYSOFT_FIREBASE_CONFIG;
   if (!cfg || !cfg.apiKey) {
     console.warn(
@@ -43,7 +52,25 @@ export async function installToySoftStorage() {
     return;
   }
 
-  const nativeLS = window.localStorage;
+  if (typeof firebase.auth !== 'function') {
+    console.error('[ToySoft] Falta firebase-auth-compat.js. Se mantiene localStorage.');
+    return;
+  }
+
+  const auth = firebase.auth();
+  await new Promise((resolve) => {
+    const unsub = auth.onAuthStateChanged(() => {
+      unsub();
+      resolve();
+    });
+  });
+
+  if (!auth.currentUser) {
+    console.warn('[ToySoft] Sin sesión Firebase: datos en localStorage del navegador hasta que inicies sesión.');
+    return;
+  }
+
+  const nativeLS = NATIVE_LOCAL_STORAGE;
   const memory = Object.create(null);
   let db = null;
   let flushTimer = null;
@@ -230,4 +257,5 @@ export async function installToySoftStorage() {
   });
 
   Object.defineProperty(window, 'localStorage', { value: shim, configurable: true });
+  firestoreShimInstalled = true;
 }

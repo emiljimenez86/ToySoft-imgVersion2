@@ -7,7 +7,11 @@ let recordatorioEditando = null;
 // Inicialización cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Inicializando sistema de recordatorios...');
-    
+
+    if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
+        return;
+    }
+
     // Cargar recordatorios desde app.js
     if (typeof cargarRecordatorios === 'function') {
         cargarRecordatorios();

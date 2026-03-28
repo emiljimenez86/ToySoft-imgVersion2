@@ -406,6 +406,7 @@
     }
   </style>
   <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics-compat.js"></script>
   <script src="firebase-config.js"></script>
@@ -2370,12 +2371,12 @@
     </div>
   </div>
 
-  <script type="application/json" id="toysoft-script-queue">["https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js","https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js","ayuda.js","inventario.js","app.js","cotizaciones.js"]</script>
+  <script type="application/json" id="toysoft-script-queue">["https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js","https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js","seguridad.js","ayuda.js","inventario.js","app.js","cotizaciones.js"]</script>
   <script type="module" src="toysoft-boot.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      verificarAcceso();
-      
+      if (!verificarAcceso()) return;
+
       // Verificar que las funciones de PIN estén disponibles
       if (typeof mostrarModalPin === 'undefined') {
         console.error('❌ Función mostrarModalPin no está disponible');

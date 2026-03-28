@@ -305,8 +305,8 @@ function inicializarAdministracion() {
   console.log('🚀 Iniciando administración...');
   
   // Verificar acceso básico
-  verificarAcceso();
-  
+  if (!verificarAcceso()) return;
+
   // Cargar datos específicos de administración
   cargarCategorias();
   cargarProductos();
@@ -1793,14 +1793,23 @@ function cargarDatosNegocio() {
 
 // Función para verificar acceso básico (sesión general)
 function verificarAcceso() {
-    // Verificar sesión general del sistema
+    const cfg = window.TOYSOFT_FIREBASE_CONFIG;
+    if (cfg && cfg.apiKey && typeof firebase !== 'undefined' && typeof firebase.auth === 'function') {
+        if (!firebase.auth().currentUser) {
+            localStorage.removeItem('sesionActiva');
+            console.log('No hay sesión Firebase, redirigiendo al login...');
+            window.location.href = 'index.html';
+            return false;
+        }
+    }
     const sesionActiva = localStorage.getItem('sesionActiva') === 'true';
     if (!sesionActiva) {
         console.log('No hay sesión activa, redirigiendo al login...');
         window.location.href = 'index.html';
-        return;
+        return false;
     }
     console.log('Sesión activa verificada');
+    return true;
 }
 
 // ===== FUNCIONES DE EMAILJS =====

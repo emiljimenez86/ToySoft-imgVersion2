@@ -1,5 +1,7 @@
 import { installToySoftStorage } from './toysoft-firestore-storage.js';
 
+window.installToySoftStorage = installToySoftStorage;
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
