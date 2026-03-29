@@ -240,8 +240,9 @@ function verificarPinAdministracion() {
     if (pinIngresado === PIN_ADMINISTRACION) {
         // PIN correcto - NO guardar acceso, siempre pedirá PIN al entrar
         
-        // Ocultar modal y mostrar contenido
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPinAdministracion'));
+        // Ocultar modal (getInstance puede ser null si no hubo instancia registrada)
+        const elPin = document.getElementById('modalPinAdministracion');
+        const modal = bootstrap.Modal.getInstance(elPin) || bootstrap.Modal.getOrCreateInstance(elPin);
         modal.hide();
         
         // Mostrar contenido de administración

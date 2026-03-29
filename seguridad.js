@@ -24,6 +24,13 @@ function ejecutarCuandoAuthListo(callback) {
         callback();
         return;
     }
+    try {
+        if (firebase.apps.length === 0 && window.TOYSOFT_FIREBASE_CONFIG) {
+            firebase.initializeApp(window.TOYSOFT_FIREBASE_CONFIG);
+        }
+    } catch (e) {
+        console.warn('[ToySoft] No se pudo asegurar initializeApp antes del auth:', e);
+    }
     const unsub = firebase.auth().onAuthStateChanged(function () {
         unsub();
         callback();
@@ -53,12 +60,22 @@ function verificarCierreDiario() {
 
 // Verificar sesión y cierre diario (devuelve false si redirige al login)
 function verificarAcceso() {
-    if (usaFirebaseAuth() && !firebase.auth().currentUser) {
-        localStorage.removeItem('sesionActiva');
-        console.log('Redirigiendo al login (sin sesión Firebase)...');
-        alert('Debes iniciar sesión en el inicio antes de abrir esta página.');
-        window.location.href = 'index.html';
-        return false;
+    if (usaFirebaseAuth()) {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            localStorage.removeItem('sesionActiva');
+            console.log('Redirigiendo al login (sin sesión Firebase)...');
+            alert('Debes iniciar sesión en el inicio antes de abrir esta página.');
+            window.location.href = 'index.html';
+            return false;
+        }
+        /* La sesión real es Firebase; sesionActiva puede faltar tras otra pestaña, Firestore o recarga. */
+        try {
+            localStorage.setItem('sesionActiva', 'true');
+        } catch (e) {
+            /* ignorar */
+        }
+        return true;
     }
     if (!verificarSesion()) {
         console.log('Redirigiendo al login...');
