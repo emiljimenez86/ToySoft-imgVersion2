@@ -3128,7 +3128,10 @@ function mostrarConfirmacionAgregado(nombreProducto, cantidad) {
 }
 
 // Event listeners para el modal de cantidad
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+  if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+  else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
   // Event listener para el input de cantidad
   const cantidadInput = document.getElementById('cantidadProducto');
   if (cantidadInput) {
@@ -7901,7 +7904,10 @@ function inicializarWhatsApp() {
 }
 
 // Inicializar WhatsApp cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     inicializarWhatsApp();
 });
 
@@ -7927,7 +7933,10 @@ function toggleWhatsApp() {
 }
 
 // Inicialización
-document.addEventListener('DOMContentLoaded', () => {
+(function (onReady) {
+  if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+  else document.addEventListener('DOMContentLoaded', onReady);
+})(() => {
   console.log('DOM cargado, iniciando aplicación...');
   
   // Cargar datos primero (esto ya incluye inicializarDatosPrueba y mostrarProductos)
@@ -11260,7 +11269,10 @@ function verificarPinAcceso() {
 }
 
 // Modificar el botón de balance en el HTML para usar el PIN
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+  if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+  else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
   const btnBalance = document.querySelector('button[onclick="mostrarModalBalance()"]');
   if (btnBalance) {
     btnBalance.onclick = function() {
@@ -11297,9 +11309,11 @@ function migrarCierresExistentes() {
 }
 
 // Llamar a la migración al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     migrarCierresExistentes();
-    // ... resto del código existente ...
 });
 
 // Función para cargar clientes en el select de cotización

@@ -1972,7 +1972,10 @@ function imprimirTirillaInventario() {
 }
 
 // Cargar inventario al iniciar (solo si estamos en la página de inventario)
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     function iniciarInventario() {
         if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
             return;

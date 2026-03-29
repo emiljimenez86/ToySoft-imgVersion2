@@ -902,7 +902,10 @@
     }
 
     // Cargar datos al iniciar
-    document.addEventListener('DOMContentLoaded', function() {
+    (function (onReady) {
+        if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+        else document.addEventListener('DOMContentLoaded', onReady);
+    })(function () {
         console.log('📄 Cargando historial.html...');
         function iniciarHistorial() {
             if (typeof verificarAcceso === 'function' && !verificarAcceso()) {

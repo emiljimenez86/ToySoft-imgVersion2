@@ -34,7 +34,7 @@ function docIdToKey(id) {
   }
 }
 
-export async function installToySoftStorage() {
+async function installToySoftStorage() {
   if (firestoreShimInstalled) {
     return;
   }
@@ -302,3 +302,5 @@ export async function installToySoftStorage() {
   Object.defineProperty(window, 'localStorage', { value: shim, configurable: true });
   firestoreShimInstalled = true;
 }
+
+window.installToySoftStorage = installToySoftStorage;

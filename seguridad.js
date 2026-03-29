@@ -171,8 +171,11 @@ async function cerrarSesion() {
     window.location.href = 'index.html';
 }
 
-// Verificar sesión al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
+// Verificar sesión al cargar la página (tras toysoft-boot, no solo DOMContentLoaded)
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     const loginSection = document.getElementById('loginSection');
     const appSection = document.getElementById('appSection');
 

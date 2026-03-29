@@ -211,7 +211,10 @@ function exportarGastos() {
     alert('Reporte exportado correctamente');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     function iniciar() {
         if (!verificarAcceso()) return;
         cargarGastos();

@@ -5,7 +5,10 @@ let recordatoriosFiltrados = [];
 let recordatorioEditando = null;
 
 // Inicialización cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     console.log('🚀 Inicializando sistema de recordatorios...');
 
     function iniciar() {

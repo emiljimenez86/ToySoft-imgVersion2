@@ -821,8 +821,11 @@
       console.log('✅ Intervalo de actualización inicializado a:', intervaloNum, 'segundos (', intervaloMs, 'ms)');
     }
 
-    // Inicializar cuando la página cargue
-    document.addEventListener('DOMContentLoaded', inicializar);
+    // Inicializar cuando la página y toysoft-boot terminen
+    (function (onReady) {
+      if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+      else document.addEventListener('DOMContentLoaded', onReady);
+    })(inicializar);
 
     // Intentar entrar en pantalla completa automáticamente
     window.addEventListener('load', () => {

@@ -224,8 +224,10 @@ function mostrarBackupsAutomaticos() {
     }
 }
 
-// PIN de administración
+// PIN de administración (solo si REQUIERE_PIN_CONFIGURACION es true)
 const PIN_ADMINISTRACION = '0011';
+/** Pon en true cuando quieras volver a pedir PIN al entrar a esta pantalla. */
+const REQUIERE_PIN_CONFIGURACION = false;
 
 // Función para verificar PIN de administración
 function verificarPinAdministracion() {
@@ -269,32 +271,40 @@ function verificarPinAdministracion() {
     }
 }
 
-// Función para verificar acceso - siempre pide PIN
+// Entrada a configuración: con PIN (modal) o directo según REQUIERE_PIN_CONFIGURACION
 function verificarAccesoAdministracion() {
+    localStorage.removeItem('accesoAdministracion');
+    localStorage.removeItem('accesoAdministracionTimestamp');
+
+    if (!REQUIERE_PIN_CONFIGURACION) {
+        const contenido = document.getElementById('contenidoAdministracion');
+        if (contenido) contenido.style.display = 'block';
+        const modalEl = document.getElementById('modalPinAdministracion');
+        if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const inst = bootstrap.Modal.getInstance(modalEl);
+            if (inst) inst.hide();
+        }
+        inicializarAdministracion();
+        return true;
+    }
+
     if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
         console.error('Bootstrap no está cargado. Revisa la consola y la carga de scripts (toysoft-boot / red).');
         alert('No se pudo cargar la interfaz (Bootstrap). Recarga la página o revisa tu conexión.');
         return false;
     }
 
-    // Limpiar cualquier acceso previo guardado
-    localStorage.removeItem('accesoAdministracion');
-    localStorage.removeItem('accesoAdministracionTimestamp');
-    
-    // Siempre mostrar modal de PIN
-    const modal = new bootstrap.Modal(document.getElementById('modalPinAdministracion'), {
+    const modalEl = document.getElementById('modalPinAdministracion');
+    const modal = new bootstrap.Modal(modalEl, {
         backdrop: 'static',
         keyboard: false
     });
     modal.show();
-    
-    // Enfocar el input de PIN y agregar listener para Enter
+
     setTimeout(() => {
         const pinInput = document.getElementById('pinAdministracion');
         if (pinInput) {
             pinInput.focus();
-            
-            // Agregar listener para Enter
             pinInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -303,7 +313,7 @@ function verificarAccesoAdministracion() {
             });
         }
     }, 500);
-    
+
     return false;
 }
 
@@ -499,8 +509,11 @@ function abrirPantallaCocina() {
   abrirPantallaCocinaDesdeAdmin();
 }
 
-// Event listener único para DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
+// Tras toysoft-boot (scripts dinámicos); DOMContentLoaded puede haber pasado ya
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     function iniciarTrasSesion() {
         if (typeof verificarAcceso === 'function' && !verificarAcceso()) {
             return;
@@ -2118,8 +2131,11 @@ function actualizarEstadoEmailJS(mensaje, tipo = 'info') {
     }
 }
 
-// Inicializar EmailJS cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+// Inicializar EmailJS cuando la página y los scripts están listos
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     setTimeout(() => {
         inicializarEmailJS();
         cargarConfiguracionEmailJS();

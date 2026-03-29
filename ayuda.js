@@ -1340,8 +1340,11 @@ function mostrarAyudaEspecifica(tipo) {
     modal.show();
 }
 
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+// Inicializar cuando el DOM y toysoft-boot hayan cargado scripts
+(function (onReady) {
+    if (typeof window.__toysoftOnReady === 'function') window.__toysoftOnReady(onReady);
+    else document.addEventListener('DOMContentLoaded', onReady);
+})(function () {
     inicializarBotonesAyuda();
     
     // Agregar botón de ayuda flotante si no existe
@@ -1397,4 +1400,4 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(btnAyuda);
     }
-}); 
+});
